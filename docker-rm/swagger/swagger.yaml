@@ -1,0 +1,582 @@
+---
+swagger: "2.0"
+info:
+  description: "Resource Manager API Specification"
+  version: "0.0.1"
+  title: "Resource Manager API"
+  contact:
+    name: "Accanto Systems Ltd"
+basePath: "/"
+tags:
+- name: "type-controller"
+  description: "Type Controller"
+- name: "topology-controller"
+  description: "Topology Controller"
+- name: "lifecycle-controller"
+  description: "Lifecycle Controller"
+- name: "configuration-controller"
+  description: "Configuration Controller"
+- name: "onboarding-controller"
+  description: "Onboarding Controller"
+paths:
+  /api/resource-manager/configuration:
+    get:
+      tags:
+      - "configuration-controller"
+      summary: "Get Resource Manager Configuration"
+      description: "Returns high-level information about the configuration of this\
+        \ Resource Manager"
+      operationId: "controllers.default_controller.get_configuration_using_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ResourceManagerConfiguration"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "configuration-controller"
+  /api/resource-manager/lifecycle/transitions:
+    post:
+      tags:
+      - "lifecycle-controller"
+      summary: "Create Resource Transition"
+      description: "Requests a transition or operation is performed on a resource\
+        \ instance"
+      operationId: "controllers.default_controller.create_transition_using_post"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json;charset=UTF-8"
+      parameters:
+      - in: "body"
+        name: "transitionRequest"
+        description: "transitionRequest"
+        required: true
+        schema:
+          $ref: "#/definitions/TransitionRequest"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/TransitionStatus"
+        201:
+          description: "Created"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "lifecycle-controller"
+  /api/resource-manager/lifecycle/transitions/{id}:
+    get:
+      tags:
+      - "lifecycle-controller"
+      summary: "Get Resource Transition"
+      description: "Returns information about the specified transition or operation\
+        \ request"
+      operationId: "controllers.default_controller.get_transition_using_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json;charset=UTF-8"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Unique id for the resource transition"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/TransitionRequest"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "lifecycle-controller"
+  /api/resource-manager/lifecycle/transitions/{id}/status:
+    get:
+      tags:
+      - "lifecycle-controller"
+      summary: "Get Resource Transition Status"
+      description: "Returns the status of the specified transition or operation"
+      operationId: "controllers.default_controller.get_transition_status_using_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json;charset=UTF-8"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Unique id for the resource transition"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/TransitionStatus"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "lifecycle-controller"
+  /api/resource-manager/topology/deployment-locations:
+    get:
+      tags:
+      - "topology-controller"
+      summary: "List Deployment Locations"
+      description: "Returns a list of deployment locations managed by this Resource\
+        \ Manager"
+      operationId: "controllers.default_controller.get_deployment_locations_using_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json;charset=UTF-8"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/DeploymentLocation"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "topology-controller"
+  /api/resource-manager/topology/deployment-locations/{name}:
+    get:
+      tags:
+      - "topology-controller"
+      summary: "Get Deployment Location"
+      description: "Returns information for the specified deployment location"
+      operationId: "controllers.default_controller.get_deployment_location_using_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json;charset=UTF-8"
+      parameters:
+      - name: "name"
+        in: "path"
+        description: "Unique name of the deployment location"
+        required: true
+        type: "string"
+        default: "dev-cloud"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/DeploymentLocation"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "topology-controller"
+  /api/resource-manager/topology/deployment-locations/{name}/instances:
+    get:
+      tags:
+      - "topology-controller"
+      summary: "Search for Resource Instances"
+      description: "Searches for resource instances managed within the specified deployment\
+        \ location"
+      operationId: "controllers.default_controller.get_instances_using_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json;charset=UTF-8"
+      parameters:
+      - name: "name"
+        in: "path"
+        description: "Unique name of the deployment location"
+        required: true
+        type: "string"
+        default: "dev-cloud"
+      - name: "instanceType"
+        in: "query"
+        description: "Exact match of resource type"
+        required: false
+        type: "string"
+      - name: "instanceName"
+        in: "query"
+        description: "Partial match for resource instance name"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ResourceInstance"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "topology-controller"
+  /api/resource-manager/topology/instances/{id}:
+    get:
+      tags:
+      - "topology-controller"
+      summary: "Get Resource Instance"
+      description: "Returns information for the specified resource instance"
+      operationId: "controllers.default_controller.get_instance_using_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json;charset=UTF-8"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Unique id for the resource instance"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ResourceInstance"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "topology-controller"
+  /api/resource-manager/types:
+    get:
+      tags:
+      - "type-controller"
+      summary: "List Resource Types"
+      description: "Returns a list of all resource types managed by this Resource\
+        \ Manager"
+      operationId: "controllers.default_controller.get_types_using_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json;charset=UTF-8"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ResourceType"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "type-controller"
+  /api/resource-manager/types/{name}:
+    get:
+      tags:
+      - "type-controller"
+      summary: "Get Resource Type"
+      description: "Returns information about a specific resource type"
+      operationId: "controllers.default_controller.get_type_using_get"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json;charset=UTF-8"
+      parameters:
+      - name: "name"
+        in: "path"
+        description: "Name for the resource type"
+        required: true
+        type: "string"
+        default: "default-rm::Resource::Network"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/ResourceType"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "type-controller"
+  /api/resource-manager/onboarding:
+    put:
+      tags:
+      - "onboarding-controller"
+      summary: "Reload Resource Descriptors"
+      description: "Reloads all resource descriptors"
+      operationId: "controllers.default_controller.reload_resource_descriptors_using_put"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: string
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-tags:
+      - tag: "onboarding-controller"
+definitions:
+  TransitionRequest:
+    type: "object"
+    properties:
+      requestId:
+        type: "string"
+        example: "80fc4a66-7e92-41f8-b4bb-7cb98193f5fa"
+        description: "UUID generated by the Resource Manager for this request"
+      resourceManagerId:
+        type: "string"
+        example: "default-rm::dev"
+        description: "Optional id used to uniquely identify the Resource Manager instance"
+      deploymentLocation:
+        type: "string"
+        example: "dev-cloud"
+        description: "Unique identifier for the specific deployment location referenced\
+          \ in this request"
+      resourceType:
+        type: "string"
+        example: "default-rm::Resource::Network"
+        description: "Type identifier for this resource"
+      transitionName:
+        type: "string"
+        example: "Transition::Start"
+        description: "Name of the requested transition/operation to be performed by\
+          \ the Resource Manager"
+      resourceId:
+        type: "string"
+        example: "default-rm://c675e0bd-9c6c-43ca-84bf-2c061d439c6b"
+        description: "Unique identifier for the resource, as generated by the Resource\
+          \ Manager"
+      resourceName:
+        type: "string"
+        example: "dev-network"
+        description: "Human-readable (unique) name given to the resource by the Lifecycle\
+          \ Manager"
+      resourceState:
+        type: "string"
+        example: "Active"
+        description: "Current state of the resource prior to the requested transition/operation.\
+          \ Optional, but can be used by the Resource Manager to validate against\
+          \ its understanding of the state"
+      properties:
+        type: "object"
+        description: "Key/value pairs for the properties of the relevant resource"
+        additionalProperties:
+          type: "string"
+      context:
+        type: "object"
+        description: "Optional additional key/value pairs for contextual information\
+          \ about the request"
+        additionalProperties:
+          type: "string"
+      requestState:
+        type: "string"
+        example: "FAILED"
+        description: "Enumerated value indicating the current state of this request"
+        enum:
+        - "PENDING"
+        - "IN_PROGRESS"
+        - "COMPLETED"
+        - "CANCELLED"
+        - "FAILED"
+      requestStateReason:
+        type: "string"
+        example: "Transition timed out after 600 seconds"
+        description: "Optional string to give more information as to the current state\
+          \ of this request, e.g. to indicate what error has occurred in failure scenarios"
+      startedAt:
+        type: "string"
+        format: "date-time"
+        example: "2017-05-01T12:00:00Z"
+        description: "Optional date and time this transition was started"
+      finishedAt:
+        type: "string"
+        format: "date-time"
+        example: "2017-05-01T12:00:05Z"
+        description: "Optional date and time this transition was completed"
+  ResourceInstance:
+    type: "object"
+    properties:
+      resourceId:
+        type: "string"
+        example: "default-rm://c675e0bd-9c6c-43ca-84bf-2c061d439c6b"
+        description: "Unique identifier for the resource, as generated by the Resource\
+          \ Manager"
+      resourceName:
+        type: "string"
+        example: "dev-network"
+        description: "Human-readable (non-unique) name given to the resource by the\
+          \ Lifecycle Manager"
+      resourceType:
+        type: "string"
+        example: "default-rm::Resource::Network"
+        description: "Type identifier for this resource"
+      resourceManagerId:
+        type: "string"
+        example: "default-rm::dev"
+        description: "Optional id used to uniquely identify the Resource Manager instance\
+          \ owning this resource"
+      deploymentLocation:
+        type: "string"
+        example: "dev-cloud"
+        description: "Unique identifier for the specific deployment location for this\
+          \ resource"
+      properties:
+        type: "object"
+        description: "Key/value pairs for the properties of the resource"
+        additionalProperties:
+          type: "string"
+      createdAt:
+        type: "string"
+        format: "date-time"
+        description: "Optional date and time this resource type was created"
+      lastModifiedAt:
+        type: "string"
+        format: "date-time"
+        description: "Optional date and time this resource type was last modified"
+  ResourceManagerConfiguration:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "default-rm::dev"
+        description: "Name for the Resource Manager"
+      version:
+        type: "string"
+        example: "1.0.0"
+        description: "Version identifier for the Resource Manager (for display purposes\
+          \ only)"
+      supportedApiVersions:
+        type: "array"
+        description: "Array of supported API versions for this Resource Manager"
+        items:
+          type: "string"
+      supportedFeatures:
+        type: "object"
+        description: "Map of supported features for this Resource Manager"
+        additionalProperties:
+          type: "string"
+      properties:
+        type: "object"
+        description: "Map of properties for the configuration of this Resource Manager"
+        additionalProperties:
+          type: "string"
+  TransitionStatus:
+    type: "object"
+    properties:
+      requestId:
+        type: "string"
+        example: "80fc4a66-7e92-41f8-b4bb-7cb98193f5fa"
+        description: "Id to uniquely identify this request within the Resource Manager"
+      requestState:
+        type: "string"
+        example: "FAILED"
+        description: "Enumerated value indicating the current state of this request"
+        enum:
+        - "PENDING"
+        - "IN_PROGRESS"
+        - "COMPLETED"
+        - "CANCELLED"
+        - "FAILED"
+      requestStateReason:
+        type: "string"
+        example: "Transition timed out after 600 seconds"
+        description: "Optional string to give more information as to the current state\
+          \ of this request, e.g. to indicate what error has occurred in failure scenarios"
+      startedAt:
+        type: "string"
+        format: "date-time"
+        example: "2017-05-01T12:00:00Z"
+        description: "Optional date and time this transition was started"
+      finishedAt:
+        type: "string"
+        format: "date-time"
+        example: "2017-05-01T12:00:05Z"
+        description: "Optional date and time this transition was completed"
+      context:
+        type: "object"
+        description: "Optional map of context properties for this request"
+        additionalProperties:
+          type: "string"
+  ResourceType:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "default-rm::Resource::Network"
+        description: "Name for the resource type"
+      descriptor:
+        type: "string"
+        example: "[encoded YAML]"
+        description: "YAML descriptor for the resource type"
+      state:
+        type: "string"
+        example: "published"
+        description: "Current state of this resource type"
+        enum:
+        - "UNPUBLISHED"
+        - "PUBLISHED"
+        - "DELETED"
+      createdAt:
+        type: "string"
+        format: "date-time"
+        example: "2017-05-01T12:00:00Z"
+        description: "Optional date and time this resource type was created"
+      lastModifiedAt:
+        type: "string"
+        format: "date-time"
+        example: "2017-05-01T12:00:00Z"
+        description: "Optional date and time this resource type was last modified"
+  DeploymentLocation:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "dev-cloud"
+        description: "Name of the deployment location"
+      type:
+        type: "string"
+        example: "default-rm::Cloud"
+        description: "Type identifier for the deployment location"
+  

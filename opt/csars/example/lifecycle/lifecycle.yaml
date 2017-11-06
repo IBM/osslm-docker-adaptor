@@ -1,0 +1,10 @@
+---
+version: 1
+lifecycle:
+  install: /opt/lifecycle/install.sh
+  configure: /opt/lifecycle/configure.sh
+  start: /opt/lifecycle/start.sh
+  integrity: /opt/lifecycle/integrity.sh
+  stop: /opt/lifecycle/stop.sh
+  reconfigure: /opt/lifecycle/reconfigure.sh
+  uninstall: /opt/lifecycle/uninstall.sh 

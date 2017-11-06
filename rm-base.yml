@@ -1,0 +1,5 @@
+version: '3'
+services:
+  baseimage:
+    build: ./opt/csars/baseimage
+    image: dockerrm_baseimage

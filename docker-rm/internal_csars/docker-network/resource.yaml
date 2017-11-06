@@ -1,0 +1,27 @@
+name: resource::docker-network::1.0
+description: resource package for user defined docker network
+properties:
+  networkname:
+    type: string
+    description: name of the network
+    value: ${instance.name}
+    required: true
+  subnet:
+    type: string
+    description: subnet for new network
+    default: "10.1.1.0/24"
+  gateway:
+    type: string
+    description: subnet of user defined network
+    default: "10.1.1.1"
+  bridgename:  
+    type: string
+    description: name of the assigned linux bridge
+    read-only: true
+  networkid:
+    type: string
+    description: docker id of network instance
+    read-only: true
+lifecycle:
+- Install
+- Uninstall

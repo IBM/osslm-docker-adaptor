@@ -1,0 +1,36 @@
+name: resource::example::1.0
+description: sample docker resource package
+properties:
+  docker_network:
+    type: string
+    description: name of network to attach container to on startup
+  docker_hostname:
+    type: string
+    description: The hostname of the docker container
+  docker_ipaddr:
+    type: string
+    description: The ip address of the docker container
+  docker_gateway:
+    type: string
+    description: The ip address of the docker container gateway
+  ipaddr:
+    type: string
+    description: The ip address of the container, populated by script through ENV
+  dummy:
+    type: string
+    description: Dummy property to be filled in by scripts
+lifecycle:
+- Install
+- Configure
+- Start
+- Integrity
+- Stop
+- Reconfigure
+- Uninstall
+operations:
+  op1:
+    description: test op 1
+    properties:
+      host:
+        type: string
+        description: some op1 desc 

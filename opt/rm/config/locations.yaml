@@ -1,0 +1,5 @@
+---
+locations:
+  - name: dev
+    type: development
+    description: "development cloud"

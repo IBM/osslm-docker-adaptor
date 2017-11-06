@@ -1,0 +1,4 @@
+---
+version: 1
+operations:
+  op1: /opt/lifecycle/operation1.sh

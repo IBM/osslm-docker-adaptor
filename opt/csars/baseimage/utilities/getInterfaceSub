@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+import netifaces as ni
+import netaddr
+import argparse
+
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser()
+  parser.add_argument("interface", help="name of the interface")
+  args = parser.parse_args()
+  
+  ipinfo = ni.ifaddresses(args.interface)[ni.AF_INET][0]
+  address = ipinfo['addr']
+  netmask = ipinfo['netmask']
+  cidr = netaddr.IPNetwork('%s/%s' % (address,netmask))
+  network = cidr.network
+  print (network)  

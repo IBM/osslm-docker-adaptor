@@ -1,0 +1,16 @@
+---
+name: "docker-rm::dev"
+version: "1.0.0"
+supportedAPIVersions:
+  - "1.0"
+supportedFeatures:
+  asynchronousTransitionResponse: True
+csardirs:
+  - "csars"
+properties:
+  responseKafkaConnectionUrl: "kafka:9092"
+  responseKafkaTopicName: "docker-rm"
+  # not used yet
+  metricTopicName: "resource_metric"
+  generateTraceFile: False
+  traceFile: /opt/rm/logs/trace.csv

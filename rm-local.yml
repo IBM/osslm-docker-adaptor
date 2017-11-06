@@ -1,0 +1,22 @@
+version: '3'
+services:
+  portainer:
+    privileged: true
+    image: portainer/portainer
+    ports:
+    - "9100:9100"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./opt/portainerdata:/data
+    command: -p :9100
+  docker-rm:
+    privileged: true
+    build: ./docker-rm
+    image: docker-rm
+    ports:
+    - "8081:8081"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./opt/rm/config:/opt/rm/config
+    - ./opt/rm/logs:/opt/rm/logs
+    - ./opt/csars:/opt/rm/csars

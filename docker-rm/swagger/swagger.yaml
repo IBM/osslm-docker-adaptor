@@ -393,6 +393,10 @@ definitions:
         example: "dev-network"
         description: "Human-readable (unique) name given to the resource by the Lifecycle\
           \ Manager"
+      metricKey:
+        type: "string"
+        example: "818127b3-1904-4737-a60c-8c7bab73532d"
+        description: "A key provided to manage metrics"
       resourceState:
         type: "string"
         example: "Active"
@@ -579,4 +583,4 @@ definitions:
         type: "string"
         example: "default-rm::Cloud"
         description: "Type identifier for the deployment location"
-  
+

@@ -1,10 +1,12 @@
 import logging
+import re
 import threading
 from datetime import datetime, timezone
 #from controllers.util.DB import *
 from controllers.resource.ResourceInstance import *
 from controllers.util.Kafka import *
 from controllers.transition.Transition import *
+from controllers.util.DB import *
 
 lock = threading.Lock()
 
@@ -141,30 +143,50 @@ class TransitionTask(threading.Thread):
 		with lock:
 			self.transition.updateDB()
 
+		# Get the createdAt for the resource
+		createdAt = self.transition.finishedAt
+
+		if self.transition.transitionName.lower() != 'install':
+			with lock:
+				# Query the database to find when this resource was installed
+				dbTransitions = dbClient.findTransitionsByResourceID(self.resourceInstance.resourceId)
+				if dbTransitions != None:
+					for dbTransition in dbTransitions:
+						if 'transitionName' in dbTransition and dbTransition['transitionName'].lower() == 'install':
+							createdAt = dbTransition['finishedAt']
+
 		# send update to kafka
-		self.logger.info('completed task '+str(self.transition.requestId)+' with response ='+str(self.transition.getTransitionRequestStatus()))
-		kafkaClient.sendLifecycleEvent(self.transition.getTransitionRequestStatus())
+		kafkaMessage=self.transition.getTransitionRequestStatus()
 
-		# send additional info to kafka for reporting		
-		extraEventInfo={
-			'resourceId':self.resourceInstance.resourceId,
-			'lastTransitionName':self.transition.transitionName,
+		internalResourceInstance={
 			'name':self.resourceInstance.name,
-			'typename':self.resourceInstance.type.name,
-			'properties':self.resourceInstance.properties,
+			'type':re.sub('[:.-]','_',self.resourceInstance.type.name),
 		}
-		
-		# add container information if this is not a network
-		if self.resourceInstance.type.name != "resource::docker-network::1.0":
-			# if the  container didn't get created, then there won't be an id or conatiner
-			if self.resourceInstance.getID() != None:
-				extraEventInfo['dockerInstance']={
-					'id':self.resourceInstance.getID(),
-					'attrs':self.resourceInstance.container.attrs
-				}
-		
-		kafkaClient.sendLifecycleEvent(extraEventInfo)
+		if self.resourceInstance.type.name == "resource::docker-network::1.0":
+			if 'networkid' in self.resourceInstance.properties:
+				internalResourceInstance['id']=self.resourceInstance.properties['networkid']
+		else:
+			internalResourceInstance['id']=self.resourceInstance.getID()
 
+		resourceInstance={
+			'resourceId':self.resourceInstance.resourceId,
+			'metricKey':self.transition.metricKey,
+			'resourceName':self.resourceInstance.name,
+			'resourceType':self.resourceInstance.type.name,
+			'resourceManagerId':self.transition.resourceManagerId,
+			'deploymentLocation':self.transition.deploymentLocation,
+			'properties':self.resourceInstance.properties,
+			'createdAt': createdAt,
+			'lastModifiedAt':self.transition.finishedAt,
+			'internalResourceInstances':[internalResourceInstance],
+		}
+		kafkaMessage['transitionName']=self.transition.transitionName
+		kafkaMessage['resourceManagerId']=self.transition.resourceManagerId
+		kafkaMessage['deploymentLocation']=self.transition.deploymentLocation
+		kafkaMessage['resourceInstance']=resourceInstance
+
+		self.logger.info('completed task '+str(self.transition.requestId)+' with response ='+str(kafkaMessage))
+		kafkaClient.sendLifecycleEvent(kafkaMessage)
 
 class NoTransitionFoundException(Exception):
 	def __init__(self, requestId):

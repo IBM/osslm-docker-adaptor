@@ -38,8 +38,10 @@ class Transition:
 		self.requestId=0
 		self.properties=None
 		self.resourceName=None
+		self.metricKey=None
 		self.resourceId=None
 		self.resourceTypeName=None
+		self.resourceManagerId=None
 		self.deploymentLocation=None
 		self.transitionName=None
 		
@@ -48,10 +50,14 @@ class Transition:
 				self.properties=transitionRequest['properties']
 			if 'transitionName' in transitionRequest:
 				self.transitionName=transitionRequest['transitionName']
+			if 'resourceManagerId' in transitionRequest:
+				self.resourceManagerId=transitionRequest['resourceManagerId']
 			if 'deploymentLocation' in transitionRequest:
 				self.deploymentLocation=transitionRequest['deploymentLocation']
 			if 'resourceName' in transitionRequest:
 				self.resourceName=transitionRequest['resourceName']
+			if 'metricKey' in transitionRequest:
+				self.metricKey=transitionRequest['metricKey']
 			if 'resourceId' in transitionRequest:
 				self.resourceId=transitionRequest['resourceId']
 			if 'resourceType' in transitionRequest:
@@ -183,9 +189,10 @@ class Transition:
 				'requestId':self.requestId,
 				'requestState':self.requestState,
 				'requestStateReason': self.requestStateReason,
-				'resourceId': self.resourceId,
+				'resourceId': str(self.resourceId),
 				'startedAt':self.startedAt,
-				'context':context
+				'context':context,
+				'transitionName':self.transitionName
 				}
 
 	def getTransitionRequestResponse(self):

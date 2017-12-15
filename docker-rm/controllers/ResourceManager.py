@@ -150,7 +150,7 @@ class ResourceManager:
 		""" run transition on new or existing instance """
 		self.logger.debug('Resource Manager runTransition called with request\n\n '+str(transitionRequest)+'\n\n')
 		
-		self.rejectIfResourceBusy(transitionRequest)
+		# self.rejectIfResourceBusy(transitionRequest)
 			
 			
 		

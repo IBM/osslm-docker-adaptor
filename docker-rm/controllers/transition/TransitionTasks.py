@@ -121,7 +121,14 @@ class TransitionTask(threading.Thread):
 					resp=self.resourceInstance.runStandardTransition(transitionName,self.transition.properties)
 				else:
 					self.logger.debug('running operation '+transitionName)
-					resp=self.resourceInstance.runOperation(transitionName,self.transition.properties)
+					with lock:
+						self.logger.debug('Locked for  transition '+ transitionName 
+						+ ' resource id: ' + str(self.transition.resourceId) 
+						+ ' request id: ' + str(self.transition.requestId))
+						resp=self.resourceInstance.runOperation(transitionName,self.transition.properties)
+						self.logger.debug('Unlocked for  transition '+ transitionName 
+						+ ' resource id: ' + str(self.transition.resourceId) 
+						+ ' request id: ' + str(self.transition.requestId))
 				self.logger.debug('marking transition COMPLETED')	
 				self.transition.requestState='COMPLETED'
 				self.transition.finishedAt=str(datetime.now(timezone.utc).astimezone().isoformat())

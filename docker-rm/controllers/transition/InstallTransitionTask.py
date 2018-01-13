@@ -43,7 +43,10 @@ class InstallTransitionTask(TransitionTask):
 		#if super().validateStandardProperties(resourceType) ==False:
 		#	self.logger.error('missing properties')
 		#	raise MissingPropertiesException()
-
+		
+		# metric key is passed in all install requests
+		self.transition.properties['metricKey'] = transition.metricKey
+		
 		self.resourceInstance=controllers.ResourceManager.resourceManager.createNewResourceInstance(
 				resourceType,
 				self.transition.resourceName, 
@@ -51,7 +54,7 @@ class InstallTransitionTask(TransitionTask):
 				self.transition.properties
 				)
 		self.resourceId=self.resourceInstance.resourceId
-
+		
 		self.logger.debug('instance to be run='+str(self.resourceInstance.resourceId))
 
 	def run(self):

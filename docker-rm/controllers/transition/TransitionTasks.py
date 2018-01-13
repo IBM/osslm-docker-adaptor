@@ -56,15 +56,21 @@ class TransitionTask(threading.Thread):
 			transitionProperties = {}
 			
 		self.logger.debug('Properties to validate against descriptor: ' +str(transitionProperties))
-		
+		self.logger.debug('Properties from descriptor: ' + str(props))
 		if props==None:
 			self.logger.error('no properties found')
 			return False;
 
 		for p in props:
-			self.logger.debug('expecting '+str(props))
-			if 'default' in props[p]:
-				self.logger.debug('default value provided so pass')
+			self.logger.debug('validating '+str(p))
+			if 'default' in props[p] and p in transitionProperties:
+				self.logger.debug('default value overridden so pass')
+				pass
+			elif 'default' in props[p] and p not in transitionProperties:
+				self.logger.debug('default value for ' + str(p) 
+								+ ' not overridden, setting default value ' +  str(props[p]['default']) 
+								+ ' in transition properties')
+				transitionProperties[p] = props[p]['default']
 				pass
 			elif 'value' in props[p]:
 				self.logger.debug('value provided so pass')

@@ -179,7 +179,7 @@ class ResourceInstance:
 		
 		self.logger.debug('creating docker container for '+self.type.name)
 		volumeList=[]
-		#volumeList.append("/proc:/mnt/proc:ro")
+		volumeList.append("/sys/fs/cgroup:/sys/fs/cgroup:ro")
 		try:
 			self.container=dockerClient.containers.run(self.type.imageName,
 													name=self.type.imageName+str(self.resourceId),
@@ -187,8 +187,8 @@ class ResourceInstance:
 													hostname=hostname,
 													network=network,
 													detach=True,
-													privileged=True)#,
-													#volumes=volumeList)
+													privileged=True,
+													volumes=volumeList)
 		except (docker.errors.APIError, docker.errors.ContainerError) as ex:
 			# Need to check if a container was created and remove it if it was.
 			self.logger.error(str(ex))

@@ -1,6 +1,8 @@
 from tinydb import TinyDB, Query
 import logging
+import threading
 
+lock = threading.Lock()
 class DB:
 	""" persistence for instances and transition requests """
 	def __init__(self) :
@@ -11,7 +13,7 @@ class DB:
 			self.db.purge_tables()
 			
 			self.transitionTable=self.db.table('transitions')
-			self.instanceTable=self.db.table('instances')
+			#self.instanceTable=self.db.table('instances')
 			
 			self.logger.debug('created db at config/db.json')
 		except Exception as ex:	
@@ -22,7 +24,8 @@ class DB:
 		self.logger.debug('create transition db entry called')
 		self.logger.debug(transition)
 		try:
-			id=self.transitionTable.insert(transition)
+			with lock:
+				id=self.transitionTable.insert(transition)
 			self.logger.debug('added transition request with id '+str(id))
 		except Exception as ex:	
 			raise DBException(ex)
@@ -34,14 +37,16 @@ class DB:
 		self.logger.debug('update transition request')
 		self.logger.debug(transition)
 		try:
-			self.transitionTable.update(transition,eids=[id])
+			with lock:
+				self.transitionTable.update(transition,eids=[id])
 		except Exception as ex:	
 			raise DBException(ex)
 		
 	def removeTransition(self, eid):
 		self.logger.debug('removing transition with eid '+str(eid))
 		try:
-			self.transitionTable.remove(eids=[eid])
+			with lock:
+				self.transitionTable.remove(eids=[eid])
 		except Exception as ex:
 			self.logger.error('cannot remove transition with eid '+str(eid))
 			raise DBException(ex)

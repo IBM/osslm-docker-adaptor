@@ -341,8 +341,12 @@ class ResourceInstance:
 		self.logger.debug(properties)
 
 		if transitionName=='uninstall':
-			self.logger.debug('killing container')
+			self.logger.debug('about to kill container')
 			try:
+				if 'lifecycle' in self.type.lifecyclePath and transitionName in self.type.lifecyclePath['lifecycle']:
+					self.runTransition(self.type.lifecyclePath['lifecycle'][transitionName])
+
+				self.logger.debug('killing container')
 				self.container.kill()
 				self.container.remove()
 

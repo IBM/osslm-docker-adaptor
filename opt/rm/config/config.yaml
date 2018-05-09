@@ -10,6 +10,7 @@ csardirs:
 properties:
   responseKafkaConnectionUrl: "kafka:9092"
   responseKafkaTopicName: "docker-rm"
+  openPublicPorts: True
   # not used yet
   metricTopicName: "resource_metric"
   generateTraceFile: False

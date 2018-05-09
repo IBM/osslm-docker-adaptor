@@ -180,6 +180,16 @@ class ResourceInstance:
 		self.logger.debug('creating docker container for '+self.type.name)
 		volumeList=[]
 		volumeList.append("/sys/fs/cgroup:/sys/fs/cgroup:ro")
+		
+		if 'openPublicPorts' in globalConfig.configDescriptor['properties']:
+			public_ports_policy=globalConfig.configDescriptor['properties']['openPublicPorts']
+			# eval string to boolean
+			public_ports_policy=str(public_ports_policy) == "True"
+		else:
+			public_ports_policy=False
+			
+		self.logger.debug('public_ports_policy = '+str(public_ports_policy))
+			
 		try:
 			self.container=dockerClient.containers.run(self.type.imageName,
 													name=self.type.imageName+str(self.resourceId),
@@ -188,6 +198,7 @@ class ResourceInstance:
 													network=network,
 													detach=True,
 													privileged=True,
+													publish_all_ports=public_ports_policy,
 													volumes=volumeList)
 		except (docker.errors.APIError, docker.errors.ContainerError) as ex:
 			# Need to check if a container was created and remove it if it was.
@@ -210,6 +221,16 @@ class ResourceInstance:
 		#if the network set was host network then no ip address will be allocated so pass something dummy back
 		if network=='host':
 			self.properties['docker_ipaddr']='HOSTIP'
+
+		# public ports if any
+		port_mappings=self.container.attrs['NetworkSettings']['Ports']; 	
+		self.logger.debug('port_mappings: ' + str(port_mappings))
+		if port_mappings is not None:
+			for val in port_mappings:
+				next_port_mapping=port_mappings[val]
+				if next_port_mapping is not None:
+					self.logger.debug(val + ' mapped to ' + str(next_port_mapping[0])) 
+					self.properties['port_mapping_'+ val]=next_port_mapping[0]['HostPort']
 
 		# if there are additional docker_network properties, then add those networks to the container 
 		# and update the read-only propeties for each if they exist
@@ -341,8 +362,12 @@ class ResourceInstance:
 		self.logger.debug(properties)
 
 		if transitionName=='uninstall':
-			self.logger.debug('killing container')
+			self.logger.debug('about to kill container')
 			try:
+				if 'lifecycle' in self.type.lifecyclePath and transitionName in self.type.lifecyclePath['lifecycle']:
+					self.runTransition(self.type.lifecyclePath['lifecycle'][transitionName])
+
+				self.logger.debug('killing container')
 				self.container.kill()
 				self.container.remove()
 

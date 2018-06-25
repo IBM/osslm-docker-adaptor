@@ -85,7 +85,7 @@ class DB:
 			i=self.transitionTable.get(eid=int(id))
 			self.logger.debug(i)
 		except Exception as ex:
-			self.logger.error('cannot find transition with eid '+str(eid))
+			self.logger.error('cannot find transition with eid '+str(id))
 			raise DBException(ex)
 		
 		return i

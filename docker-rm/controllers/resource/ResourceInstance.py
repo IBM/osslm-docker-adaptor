@@ -342,16 +342,13 @@ class ResourceInstance:
 
 		if transitionName=='uninstall':
 			self.logger.debug('killing container')
+			removeResourceInstance(self.resourceId)
 			try:
 				self.container.kill()
 				self.container.remove()
-
-				#remove resource instance from the list
-				removeResourceInstance(self.resourceId)
-
-				ret={'status':'OK'}
-			except docker.errors.APIError:
-				ret={'status':'Failed'}
+			except docker.errors.APIError as ex:
+				self.logger.error('caught exception during uninstall, continuing '+ str(type(ex).__name__) + ' ' +str(ex))
+			ret={'status':'OK'}	
 			return ret
 
 		if transitionName=='install':

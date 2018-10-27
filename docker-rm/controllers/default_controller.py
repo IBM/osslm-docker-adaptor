@@ -76,6 +76,9 @@ def get_transition_status_using_get(id) -> str:
 	logger.debug('get transition status for id '+id)
 
 	resp=resourceManager.getTransitionStatus(id)
+	if 'requestStateReason' in resp and resp['requestStateReason'].startswith('Failure from Virtual Infrastructure'):
+		resp['requestFailureCode'] = 'RESOURCE_NOT_FOUND'
+		
 	logger.debug(resp)
 
 	traceMessage("GET Transition Status1",id, resp)
@@ -90,6 +93,8 @@ def get_transition_using_get(id) -> str:
 
 	""" return current status of transition id """
 	resp=resourceManager.getTransitionRequest(id)
+	if 'requestStateReason' in resp and resp['requestStateReason'].startswith('Failure from Virtual Infrastructure'):
+		resp['requestFailureCode'] = 'RESOURCE_NOT_FOUND'	
 	logger.debug(resp)
 
 	traceMessage("GET Transition Status2",id, resp)

@@ -140,7 +140,6 @@ class TransitionTask(threading.Thread):
 				self.transition.finishedAt=str(datetime.now(timezone.utc).astimezone().isoformat())
 			except Exception as ex:
 				self.logger.error('caught transition exception '+ str(type(ex).__name__) + ' ' +str(ex))
-				
 				resp=None
 				self.reportFailedTask("Failure from Virtual Infrastructure: " + str(ex))
 	
